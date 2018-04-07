@@ -19,6 +19,8 @@ npm install danmaku-fetcher --save-dev
 首先先将插件中的构造函数引入
 
 ```javascript
+let {Fetcher, Manager, IPlugin} = require('danmaku-fetcher')
+
 
 ```
 
