@@ -2,7 +2,7 @@
 
 一款基于Node.js的可扩展的弹幕获取器
 
-现暂时仅支持biilibili
+现暂时仅支持biilibili**直播**
 
 
 
