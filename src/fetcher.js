@@ -4,14 +4,9 @@ var crypto = require("crypto");
 
 
 let transToMD5 = function (data) {
-    let newArray = []
-    data.forEach((item, index) => {
-        let md5 = crypto.createHash("md5WithRSAEncryption").update(JSON.stringify(item)).digest("hex")
-        newArray.push(md5)
+    let newArray = data.map((item) => {
+        return crypto.createHash("md5WithRSAEncryption").update(JSON.stringify(item)).digest("hex")
     })
-    // let newArray = data.map((item) => {
-    //     return crypto.createHash("md5WithRSAEncryption").update(JSON.stringify(item)).digest("hex")
-    // })
     return newArray
 }
 
@@ -19,19 +14,18 @@ let transToMD5 = function (data) {
 
 module.exports = class Fetcher {
     constructor (dat) {
-
         let {url, data, type, time} = dat
-
         this.url = url // required
         this.data = data // required
         this.type = type || BILIBILI
         this.time = time || 500
+        this.timer = null
         this._taskQueue = []
         this._oldMD5Array = []
     }
     work () {
         if (this.type === BILIBILI) {
-            this.timer = setInterval (() => {
+            this._timer = setInterval (() => {
                 this.biliFetcher().then((body) => {
                     let obj = JSON.parse(body)  
                     let data = obj.data.room
@@ -54,23 +48,35 @@ module.exports = class Fetcher {
             // TODO: 其他的一些Fetcher
         }
     }
+    stop () {
+        this._oldMD5Array.length = 0
+        this._taskQueue.length = 0
+        clearInterval(this._timer)
+    }
     produce (plugin) {
         if (!this._taskQueue.length) {
-            return 'noValue'
+            return
         }
-        let obj
-        for (let i = 0; i < this._taskQueue.length; i++) {
-            if (this._taskQueue[i].text.split(' ')[0] === plugin.name) {
-                obj = this._taskQueue.splice(i, 1)[0]
-                break
-            }
-        }
-        if (obj) {
-            obj.pluginName = obj.text.split(' ')[0]
-            obj.command = obj.text.match(/^(\S+)\s(.*)/).slice(1)[1]
+        if (plugin.name === 'default') {
+            let obj = this._taskQueue.splice(0, 1)[0]
+            obj.pluginName = 'default'
+            obj.command = obj.text
             return obj
         } else {
-            return 'noValue'
+            let obj
+            for (let i = 0; i < this._taskQueue.length; i++) {
+                if (this._taskQueue[i].text.split(' ')[0] === plugin.name) {
+                    obj = this._taskQueue.splice(i, 1)[0]
+                    break
+                }
+            }
+            if (obj) {
+                obj.pluginName = obj.text.split(' ')[0]
+                obj.command = obj.text.match(/^(\S+)\s(.*)/).slice(1)[1]
+                return obj
+            } else {
+                return
+            }
         }
     }
     biliFetcher () {
