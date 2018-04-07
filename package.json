@@ -1,0 +1,27 @@
+{
+  "name": "danmaku-fetcher",
+  "version": "0.0.1",
+  "description": "Danmaku-fetcher",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Dieber/danmaku-fetcher.git"
+  },
+  "keywords": [
+    "danmaku",
+    "live"
+  ],
+  "author": "Dieber",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/Dieber/danmaku-fetcher/issues"
+  },
+  "homepage": "https://github.com/Dieber/danmaku-fetcher#readme",
+  "dependencies": {
+    "crypto": "^1.0.1",
+    "request": "^2.85.0"
+  }
+}
