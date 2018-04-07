@@ -14,7 +14,7 @@
     "danmaku",
     "live"
   ],
-  "author": "Dieber",
+  "author": "dieber",
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/Dieber/danmaku-fetcher/issues"
@@ -23,5 +23,9 @@
   "dependencies": {
     "crypto": "^1.0.1",
     "request": "^2.85.0"
+  },
+  "devDependencies": {
+    "koa": "^2.5.0",
+    "koa-static": "^4.0.2"
   }
 }

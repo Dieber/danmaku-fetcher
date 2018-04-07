@@ -10,11 +10,7 @@ const app = new Koa();
 const main = serve(path.join(__dirname + '/static'));
 
 
-let Fetcher = require('./fetcher')
-let Manager = require('./manager')
-let IPlugin = require('./plugin')
-
-// let data = 
+let {Fetcher, Manager, IPlugin} = require('../index.js')
 
 
 let fetcher = new Fetcher ({
