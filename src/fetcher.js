@@ -1,18 +1,11 @@
 const BILIBILI = 'bilibili'
 const request = require('request');
-var crypto = require("crypto");
-
-
-let transToMD5 = function (data) {
-    let newArray = data.map((item) => {
-        return crypto.createHash("md5WithRSAEncryption").update(JSON.stringify(item)).digest("hex")
-    })
-    return newArray
-}
+const { BiliFetcher } = require('./bili-fetcher/index.js')
 
 
 
-module.exports = class Fetcher {
+
+class Fetcher {
     constructor (dat) {
         let {url, data, type, time} = dat
         this.url = url // required
@@ -23,30 +16,24 @@ module.exports = class Fetcher {
         this._taskQueue = []
         this._oldMD5Array = []
     }
+    static regist (fetcher) {
+        Fetcher.list[fetcher._name] = fetcher
+    }
     work () {
-        if (this.type === BILIBILI) {
-            this._timer = setInterval (() => {
-                this.biliFetcher().then((body) => {
-                    let obj = JSON.parse(body)  
-                    let data = obj.data.room
-                    let newMD5Array = transToMD5(data)
-                    if (this._oldMD5Array.length === 0) {
-                        this._oldMD5Array.splice(0, this._oldMD5Array.length, ...newMD5Array)
-                    } else {
-                        for (let i = 0; i < this._oldMD5Array.length; i++) {
-                            if (this._oldMD5Array[i] === newMD5Array[0]) {
-                                let newData = data.splice(data.length - i, i)
-                                this._taskQueue.push(...newData)
-                                break
-                            }
-                        }
-                        this._oldMD5Array.splice(0, this._oldMD5Array.length, ...newMD5Array)
-                    }
+        this._timer = setInterval (() => {
+            if (Fetcher.list[this.type]) {
+                Fetcher.list[this.type].fetch(this.url, this.data, this._taskQueue, this._oldMD5Array).then(() => {
                 })
-            }, this.time)
-        } else if (this.type === 'TODO') {
-            // TODO: 其他的一些Fetcher
-        }
+            }
+        }, this.time)
+        // if (this.type === BILIBILI) {
+        //     this._timer = setInterval (() => {
+        //         BiliFetcher.fetch(this.url, this.data, this._taskQueue, this._oldMD5Array).then(() => {
+
+        //         })
+        // } else if (this.type === 'TODO') {
+        //     // TODO: 其他的一些Fetcher
+        // }
     }
     stop () {
         this._oldMD5Array.length = 0
@@ -54,7 +41,7 @@ module.exports = class Fetcher {
         clearInterval(this._timer)
     }
     produce (plugin) {
-        if (!this._taskQueue.length) {
+        if (!this._taskQueue || !this._taskQueue.length) {
             return
         }
         if (plugin.name === 'default') {
@@ -79,20 +66,9 @@ module.exports = class Fetcher {
             }
         }
     }
-    biliFetcher () {
-        return new Promise ((resolve, reject) => {
-            request({
-                url: this.url,
-                method: "POST",
-                form: this.data,
-            }, (error, response, body) => {
-                if (!error && response.statusCode == 200) {
-                    resolve(body)
-                } else {
-                    reject(error)
-                }
-            }); 
-        })
-    }
 }
+Fetcher.list = {}
+Fetcher.regist(BiliFetcher)
+
+module.exports = Fetcher
 
