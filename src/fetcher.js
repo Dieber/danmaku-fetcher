@@ -1,6 +1,6 @@
-const BILIBILI = 'bilibili'
 const request = require('request');
 const { BiliFetcher } = require('./bili-fetcher/index.js')
+const { QQBotFetcher } = require('./qqbot-fetcher/index.js')
 
 
 
@@ -10,7 +10,7 @@ class Fetcher {
         let {url, data, type, time} = dat
         this.url = url // required
         this.data = data // required
-        this.type = type || BILIBILI
+        this.type = type || 'bili'
         this.time = time || 500
         this.timer = null
         this._taskQueue = []
@@ -26,14 +26,6 @@ class Fetcher {
                 })
             }
         }, this.time)
-        // if (this.type === BILIBILI) {
-        //     this._timer = setInterval (() => {
-        //         BiliFetcher.fetch(this.url, this.data, this._taskQueue, this._oldMD5Array).then(() => {
-
-        //         })
-        // } else if (this.type === 'TODO') {
-        //     // TODO: 其他的一些Fetcher
-        // }
     }
     stop () {
         this._oldMD5Array.length = 0
@@ -69,6 +61,6 @@ class Fetcher {
 }
 Fetcher.list = {}
 Fetcher.regist(BiliFetcher)
-
+Fetcher.regist(QQBotFetcher)
 module.exports = Fetcher
 

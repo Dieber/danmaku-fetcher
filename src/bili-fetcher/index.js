@@ -18,7 +18,6 @@ class BiliFetcher {
                 if (_oldMD5Array[i] === newMD5Array[0]) {
                     let newData = data.splice(data.length - i, i)
                     _taskQueue.push(...newData)
-
                     break
                 }
             }
